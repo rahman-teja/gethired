@@ -1,7 +1,7 @@
 FROM golang:1.18 AS build
 WORKDIR /go/src/github.com/org/repo
 
-COPY go.* .
+COPY go.* ./
 RUN go mod download
 COPY . .
 
