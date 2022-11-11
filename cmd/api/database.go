@@ -20,6 +20,7 @@ func InitDatabase(cfg config.Database) *sql.DB {
 	db.SetConnMaxLifetime(cfg.MaxLifetime)
 	db.SetMaxOpenConns(cfg.MaxOpenConn)
 	db.SetMaxIdleConns(cfg.MaxIdleConn)
+	log.Infof("cfg.MaxLifetime %.0f | cfg.MaxOpenConn %d | cfg.MaxIdleConn %d", cfg.MaxLifetime.Minutes(), cfg.MaxOpenConn, cfg.MaxIdleConn)
 	log.Infof("Successfully open connection to [%s]:%s", cfg.Driver, cfg.Dsn)
 
 	return db
