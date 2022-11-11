@@ -1,0 +1,3 @@
+make install && \
+make create-database && \
+make run-dev
