@@ -58,7 +58,8 @@ func (q *ActivityRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.C
 	for rows.Next() {
 		var data entity.Activity
 
-		var ca, ua, da string
+		var ca, ua string
+		var da interface{}
 
 		err = rows.Scan(
 			&data.ID,
@@ -81,10 +82,13 @@ func (q *ActivityRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.C
 		data.CreatedAt = dbhelper.ToSqlFormat(ca)
 		data.UpdatedAt = dbhelper.ToSqlFormat(ua)
 
-		if da != "" {
-			tm := dbhelper.ToSqlFormat(da)
-			if !tm.IsZero() {
-				data.DeletedAt = &tm
+		if da != nil {
+			valDa, ok := da.(string)
+			if ok {
+				tm := dbhelper.ToSqlFormat(valDa)
+				if !tm.IsZero() {
+					data.DeletedAt = &tm
+				}
 			}
 		}
 
@@ -100,7 +104,7 @@ func (a *ActivityRepositoryMysql) GetOne(ctx context.Context, id int64, tx *sql.
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("select id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and id = ?", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and activity_group_id = ?", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
@@ -138,7 +142,7 @@ func (a *ActivityRepositoryMysql) Get(ctx context.Context, tx *sql.Tx) ([]entity
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("select id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query)
 	if err != nil {
@@ -229,7 +233,7 @@ func (a *ActivityRepositoryMysql) GetOneForUpdate(ctx context.Context, id int64,
 
 	var cmd sqlcommand.Command = tx
 
-	query := fmt.Sprintf("select id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and id = ? FOR UPDATE", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and activity_group_id = ? FOR UPDATE", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
@@ -295,7 +299,7 @@ func (a *ActivityRepositoryMysql) Update(ctx context.Context, id int64, assets e
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("update %s set email = ?, title = ?, created_at = ?, updated_at = ? where id = ?", a.table)
+	query := fmt.Sprintf("update %s set email = ?, title = ?, created_at = ?, updated_at = ? where is_deleted = 0 and activity_group_id = ?", a.table)
 
 	_, err := a.exec(ctx, cmd, query, assets.Email, assets.Title, assets.CreatedAt, assets.UpdatedAt, id)
 	if err != nil {
@@ -323,7 +327,7 @@ func (a *ActivityRepositoryMysql) Delete(ctx context.Context, id int64, tx *sql.
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("update %s set deleted_at = ?, is_deleted = ? where is_deleted = 0 and id = ?", a.table)
+	query := fmt.Sprintf("update %s set deleted_at = ?, is_deleted = ? where is_deleted = 0 and activity_group_id = ?", a.table)
 
 	res, err := a.exec(ctx, cmd, query, time.Now().UTC(), 1, id)
 	if err != nil {

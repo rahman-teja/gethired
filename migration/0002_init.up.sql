@@ -10,5 +10,5 @@ create table todos (
     is_deleted TINYINT(1) default 0,
     INDEX (is_deleted),
     INDEX (activity_group_id),
-    FOREIGN KEY (activity_group_id) REFERENCES activites(id)
+    FOREIGN KEY (activity_group_id) REFERENCES activites(activity_group_id)
 );

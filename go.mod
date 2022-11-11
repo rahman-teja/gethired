@@ -7,10 +7,10 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/joho/godotenv v1.3.0
+	github.com/rahman-teja/rhelper v0.0.0-20210907131216-f8b28d86b84d
 	github.com/sirupsen/logrus v1.9.0
 	gitlab.com/rteja-library3/rapperror v0.0.0-20220214163128-c412f6a9676f
 	gitlab.com/rteja-library3/rdecoder v0.0.0-20220418142110-54c9401685dc
-	gitlab.com/rteja-library3/rhelper v0.0.0-20220216064332-0dfcfb216ad0
 	gitlab.com/rteja-library3/rserver v0.0.0-20220217182527-036803242224
 )
 
@@ -32,6 +32,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	gitlab.com/rteja-library3/rencryption v0.0.0-20220215103608-74b4d02b0678 // indirect
+	gitlab.com/rteja-library3/rhelper v0.0.0-20220216064332-0dfcfb216ad0 // indirect
 	gitlab.com/rteja-library3/rresponser v0.0.0-20220216084939-c8de6b8a6a8c // indirect
 	go.mongodb.org/mongo-driver v1.8.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect

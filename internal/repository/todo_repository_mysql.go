@@ -58,7 +58,8 @@ func (q *ToDoRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.Comma
 	for rows.Next() {
 		var data entity.ToDo
 
-		var ca, ua, da, ia string
+		var ca, ua, ia string
+		var da interface{}
 
 		err = rows.Scan(
 			&data.ID,
@@ -84,10 +85,13 @@ func (q *ToDoRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.Comma
 		data.CreatedAt = dbhelper.ToSqlFormat(ca)
 		data.UpdatedAt = dbhelper.ToSqlFormat(ua)
 
-		if da != "" {
-			tm := dbhelper.ToSqlFormat(da)
-			if !tm.IsZero() {
-				data.DeletedAt = &tm
+		if da != nil {
+			valDa, ok := da.(string)
+			if ok {
+				tm := dbhelper.ToSqlFormat(valDa)
+				if !tm.IsZero() {
+					data.DeletedAt = &tm
+				}
 			}
 		}
 
@@ -103,9 +107,9 @@ func (a *ToDoRepositoryMysql) GetOne(ctx context.Context, id int64, tx *sql.Tx) 
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("select id, activity_group_id, title, is_active, priority, created_at, updated_at, deleted_at from %s where id = ? and is_deleted = ?", a.table)
+	query := fmt.Sprintf("select id, activity_group_id, title, is_active, priority, created_at, updated_at, deleted_at from %s where is_deleted = 0 and id = ?", a.table)
 
-	acts, err := a.queryRow(ctx, cmd, query, id, 0)
+	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
 		logrus.
 			WithFields(logrus.Fields{
@@ -241,9 +245,9 @@ func (a *ToDoRepositoryMysql) GetOneForUpdate(ctx context.Context, id int64, tx 
 
 	var cmd sqlcommand.Command = tx
 
-	query := fmt.Sprintf("select id, activity_group_id, title, is_active, priority, created_at, updated_at, deleted_at from %s where id = ? and is_deleted = ? FOR UPDATE", a.table)
+	query := fmt.Sprintf("select id, activity_group_id, title, is_active, priority, created_at, updated_at, deleted_at from %s where is_deleted = 0 and id = ? FOR UPDATE", a.table)
 
-	acts, err := a.queryRow(ctx, cmd, query, id, 0)
+	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
 		logrus.
 			WithFields(logrus.Fields{

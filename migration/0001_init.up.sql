@@ -1,5 +1,5 @@
 create table activites (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    activity_group_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     email TEXT NOT NULL,
     title TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,

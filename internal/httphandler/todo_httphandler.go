@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gitlab.com/rteja-library3/rapperror"
 	"gitlab.com/rteja-library3/rdecoder"
-	"gitlab.com/rteja-library3/rhelper"
 )
 
 type ToDoHttpHandler struct {
@@ -265,10 +264,10 @@ func (a ToDoHttpHandler) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 func (a ToDoHttpHandler) GetHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	actId := rhelper.QueryStringToInt64(r, "activity_group_id", 0)
+	actId := chihelper.QueryStringToPointerInt64(r, "activity_group_id", 0)
 
 	filter := repository.ToDoQueryRepositoryFilter{
-		ActivityId: &actId,
+		ActivityId: actId,
 	}
 
 	acts, err := a.Query.Get(ctx, filter)
