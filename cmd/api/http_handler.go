@@ -25,9 +25,9 @@ func InitHttpHandler(db *sql.DB, opt cors.Options) http.Handler {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
+	// r.Use(middleware.RequestID)
+	// r.Use(middleware.RealIP)
+	// r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.New(opt).Handler)
 	r.Use(middleware.Compress(5, "gzip"))

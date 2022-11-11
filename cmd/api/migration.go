@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -54,6 +55,8 @@ func InitMigration(db *sql.DB, dbname string) error {
 	} else {
 		log.Println("Migrate down")
 		m.Down()
+		m.Close()
+		return errors.New("err: Down")
 	}
 
 	return nil

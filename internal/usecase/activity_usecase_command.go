@@ -22,16 +22,6 @@ func NewActivityCommandUsecase(props ActivityUsecaseProps) *ActivityCommandUseca
 }
 
 func (a *ActivityCommandUsecase) Create(ctx context.Context, act model.Activity) (entity.Activity, error) {
-	tx, err := a.repo.BeginTx(ctx)
-	if err != nil {
-		return entity.Activity{}, rapperror.ErrInternalServerError(
-			"",
-			"Something went wrong when beginx tx",
-			"",
-			nil,
-		)
-	}
-
 	tmNow := time.Now().UTC()
 
 	insertedActivity := entity.Activity{
@@ -45,23 +35,9 @@ func (a *ActivityCommandUsecase) Create(ctx context.Context, act model.Activity)
 		insertedActivity.Email = *act.Email
 	}
 
-	insertId, err := a.repo.Create(ctx, insertedActivity, tx)
+	insertId, err := a.repo.Create(ctx, insertedActivity, nil)
 	if err != nil {
-		tx.Rollback()
-
 		return entity.Activity{}, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		tx.Rollback()
-
-		return entity.Activity{}, rapperror.ErrInternalServerError(
-			"",
-			"Something went wrong when commit",
-			"",
-			nil,
-		)
 	}
 
 	insertedActivity.ID = insertId

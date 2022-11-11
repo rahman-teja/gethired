@@ -7,3 +7,7 @@ func ToSqlFormat(dt string) time.Time {
 
 	return t
 }
+
+func ToSqlFormatFromEpoch(dt int64) time.Time {
+	return time.Unix(0, dt*int64(time.Millisecond))
+}

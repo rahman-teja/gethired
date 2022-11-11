@@ -58,8 +58,7 @@ func (q *ActivityRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.C
 	for rows.Next() {
 		var data entity.Activity
 
-		var ca, ua string
-		var da interface{}
+		var ca, ua, da int64
 
 		err = rows.Scan(
 			&data.ID,
@@ -79,18 +78,8 @@ func (q *ActivityRepositoryMysql) queryRow(ctx context.Context, cmd sqlcommand.C
 			return
 		}
 
-		data.CreatedAt = dbhelper.ToSqlFormat(ca)
-		data.UpdatedAt = dbhelper.ToSqlFormat(ua)
-
-		if da != nil {
-			valDa, ok := da.(string)
-			if ok {
-				tm := dbhelper.ToSqlFormat(valDa)
-				if !tm.IsZero() {
-					data.DeletedAt = &tm
-				}
-			}
-		}
+		data.CreatedAt = dbhelper.ToSqlFormatFromEpoch(ca)
+		data.UpdatedAt = dbhelper.ToSqlFormatFromEpoch(ua)
 
 		datas = append(datas, data)
 	}
@@ -104,7 +93,7 @@ func (a *ActivityRepositoryMysql) GetOne(ctx context.Context, id int64, tx *sql.
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and activity_group_id = ?", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where activity_group_id = ?", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
@@ -142,7 +131,7 @@ func (a *ActivityRepositoryMysql) Get(ctx context.Context, tx *sql.Tx) ([]entity
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query)
 	if err != nil {
@@ -233,7 +222,7 @@ func (a *ActivityRepositoryMysql) GetOneForUpdate(ctx context.Context, id int64,
 
 	var cmd sqlcommand.Command = tx
 
-	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where is_deleted = 0 and activity_group_id = ? FOR UPDATE", a.table)
+	query := fmt.Sprintf("select activity_group_id, email, title, created_at, updated_at, deleted_at from %s where activity_group_id = ? FOR UPDATE", a.table)
 
 	acts, err := a.queryRow(ctx, cmd, query, id)
 	if err != nil {
@@ -273,7 +262,12 @@ func (a *ActivityRepositoryMysql) Create(ctx context.Context, assets entity.Acti
 
 	query := fmt.Sprintf("insert into %s set email = ?, title = ?, created_at = ?, updated_at = ?", a.table)
 
-	res, err := a.exec(ctx, cmd, query, assets.Email, assets.Title, assets.CreatedAt, assets.UpdatedAt)
+	res, err := a.exec(ctx, cmd, query,
+		assets.Email,
+		assets.Title,
+		assets.CreatedAt.UnixNano()/1000000,
+		assets.UpdatedAt.UnixNano()/1000000,
+	)
 	if err != nil {
 		logrus.
 			WithFields(logrus.Fields{
@@ -299,9 +293,14 @@ func (a *ActivityRepositoryMysql) Update(ctx context.Context, id int64, assets e
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("update %s set email = ?, title = ?, created_at = ?, updated_at = ? where is_deleted = 0 and activity_group_id = ?", a.table)
+	query := fmt.Sprintf("update %s set email = ?, title = ?, updated_at = ? where activity_group_id = ?", a.table)
 
-	_, err := a.exec(ctx, cmd, query, assets.Email, assets.Title, assets.CreatedAt, assets.UpdatedAt, id)
+	_, err := a.exec(ctx, cmd, query,
+		assets.Email,
+		assets.Title,
+		time.Now().UnixNano()/1000000,
+		id,
+	)
 	if err != nil {
 		logrus.
 			WithFields(logrus.Fields{
@@ -327,9 +326,9 @@ func (a *ActivityRepositoryMysql) Delete(ctx context.Context, id int64, tx *sql.
 		cmd = tx
 	}
 
-	query := fmt.Sprintf("update %s set deleted_at = ?, is_deleted = ? where is_deleted = 0 and activity_group_id = ?", a.table)
+	query := fmt.Sprintf("delete from %s where activity_group_id = ?", a.table)
 
-	res, err := a.exec(ctx, cmd, query, time.Now().UTC(), 1, id)
+	res, err := a.exec(ctx, cmd, query, id)
 	if err != nil {
 		logrus.
 			WithFields(logrus.Fields{

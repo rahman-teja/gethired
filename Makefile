@@ -3,6 +3,9 @@
 install:
 	go mod download
 
+run-dev-down:
+	go run ./cmd/api/ down
+
 run-dev:
 	go run ./cmd/api/ up
 

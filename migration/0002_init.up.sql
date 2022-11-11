@@ -1,14 +1,12 @@
 create table IF NOT EXISTS todos (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    activity_group_id int NOT NULL,
+    id BIGINT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    activity_group_id BIGINT unsigned NOT NULL,
     title TEXT NOT NULL,
     is_active CHAR(1) NOT NULL,
     priority VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP NULL default NULL,
-    is_deleted TINYINT(1) default 0,
-    INDEX (is_deleted),
+    created_at BIGINT unsigned NOT NULL,
+    updated_at BIGINT unsigned NOT NULL,
+    deleted_at BIGINT unsigned NOT NULL default 0,
     INDEX (activity_group_id),
     FOREIGN KEY (activity_group_id) REFERENCES activities(activity_group_id)
 );

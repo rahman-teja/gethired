@@ -1,7 +1,6 @@
 package httphandler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -161,8 +160,6 @@ func (a ToDoHttpHandler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		responser.NewResponserErr(err).Write(w, a.Decoder)
 		return
 	}
-
-	logrus.Info(fmt.Sprintf("data %+v", payload))
 
 	err = payload.Validate()
 	if err != nil {
