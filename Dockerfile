@@ -5,6 +5,7 @@ COPY go.* ./
 RUN go mod download
 COPY . .
 
+RUN rm .env
 RUN CGO_ENABLED=0 GOOS=linux  go build -o bin/api ./cmd/api 
 
 FROM scratch
