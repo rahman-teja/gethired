@@ -4,7 +4,7 @@ create table activites (
     title TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP default NULL,
+    deleted_at TIMESTAMP NULL default NULL,
     is_deleted TINYINT(1) default 0,
     INDEX (is_deleted)
 );
