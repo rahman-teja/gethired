@@ -67,8 +67,8 @@ func (c *Config) ReadApplicationConfig() {
 }
 
 func (c *Config) ReadDatabaseConfig() {
-	maxopencon := c.mustLoadInt(os.Getenv("DB_MAX_OPEN_CONN"), 3)
-	maxidlecon := c.mustLoadInt(os.Getenv("DB_MAX_IDLE_CONN"), 3)
+	maxopencon := c.mustLoadInt(os.Getenv("DB_MAX_OPEN_CONN"), 0)
+	maxidlecon := c.mustLoadInt(os.Getenv("DB_MAX_IDLE_CONN"), 20)
 	maxlifecon := c.mustLoadInt(os.Getenv("DB_MAX_LIFE_CONN"), 3)
 
 	host := os.Getenv("MYSQL_HOST")
@@ -86,7 +86,7 @@ func (c *Config) ReadDatabaseConfig() {
 	c.Database.Driver = "mysql"
 	c.Database.MaxOpenConn = maxopencon
 	c.Database.MaxIdleConn = maxidlecon
-	c.Database.MaxLifetime = time.Second * time.Duration(maxlifecon)
+	c.Database.MaxLifetime = time.Minute * time.Duration(maxlifecon)
 }
 
 func (c *Config) ReadCORSConfig() {
