@@ -11,6 +11,16 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+type Loggers struct{}
+
+func (l Loggers) Printf(format string, v ...interface{}) {
+	log.Printf(format, v...)
+}
+
+func (l Loggers) Verbose() bool {
+	return true
+}
+
 func InitMigration(db *sql.DB, dbname string) error {
 	args := os.Args
 	isUp := true
@@ -35,6 +45,8 @@ func InitMigration(db *sql.DB, dbname string) error {
 	if err != nil {
 		return err
 	}
+
+	m.Log = Loggers{}
 
 	if isUp {
 		log.Println("Migrate up")

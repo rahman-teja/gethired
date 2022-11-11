@@ -1,1 +1,1 @@
-drop table activites;
+drop table IF EXISTS activites;

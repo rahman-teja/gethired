@@ -1,4 +1,4 @@
-create table todos (
+create table IF NOT EXISTS todos (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     activity_group_id int NOT NULL,
     title TEXT NOT NULL,
@@ -10,5 +10,5 @@ create table todos (
     is_deleted TINYINT(1) default 0,
     INDEX (is_deleted),
     INDEX (activity_group_id),
-    FOREIGN KEY (activity_group_id) REFERENCES activites(activity_group_id)
+    FOREIGN KEY (activity_group_id) REFERENCES activities(activity_group_id)
 );

@@ -21,7 +21,7 @@ type ActivityRepositoryMysql struct {
 func NewActivityRepositoryMysql(db *sql.DB) *ActivityRepositoryMysql {
 	return &ActivityRepositoryMysql{
 		db:    db,
-		table: "activites",
+		table: "activities",
 	}
 }
 
